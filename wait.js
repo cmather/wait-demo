@@ -33,8 +33,19 @@ if (Meteor.isClient) {
       path: '/'  
     });
 
+    // whether subscribe is in a waitOn or in a before hook the functions
+    // will run the first time, then once for each invalidation.
     this.route('delay', {
       path: '/delay',
+
+      waitOn: function () {
+        return [
+          Meteor.subscribe('delayed-collection1'),
+          Meteor.subscribe('delayed-collection2')
+        ];
+      },
+
+      // before, action, after will run 3 times
       before: [
         function () {
           console.log('first before');
@@ -42,12 +53,6 @@ if (Meteor.isClient) {
 
         function () { 
           console.log('1');
-          this.subscribe('delayed-collection1').wait();
-        },
-
-        function () {
-          console.log('2');
-          this.subscribe('delayed-collection2').wait();
         }
       ]
     });
